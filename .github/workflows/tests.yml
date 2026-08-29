@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
 
   test:
@@ -37,11 +41,28 @@ jobs:
 
     needs: test
 
+    # Don't push Docker images when someone only opens a Pull Request
+    if: github.event_name == 'push'
+
     steps:
 
       - name: Checkout repository
         uses: actions/checkout@v4
 
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
       - name: Build Docker image
         run: |
-          docker build -t student-risk-api .
+          docker build -t ghcr.io/${{ github.repository_owner }}/student-risk-api:latest .
+
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/student-risk-api:latest
