@@ -1,0 +1,13 @@
+data:
+  path: "data/students_dropout_academic_success.csv"
+
+model:
+  name: "logistic_regression"
+  max_iter: 1000
+
+training:
+  test_size:  0.2
+  random_state: 42
+
+validation:
+  min_macro_f1: .70
